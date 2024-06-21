@@ -1,7 +1,8 @@
-import { StyleSheet, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 import Typography from '../ui/Typography'
 import { Action, Calendar } from '@/app/models/ChallengeData'
 import { EmptyEventCard, EventCard } from './EventCard'
+import { router } from 'expo-router'
 
 interface EventProps {
     month: Calendar
@@ -25,6 +26,16 @@ export function EventItem({ month, customerAddress }: EventProps) {
         11: "December",
     }
 
+    const goToDetail = (item) => {
+        item = { ...item, customerAddress: customerAddress }
+
+        router.push({
+            pathname: '/details',
+            params: { action: JSON.stringify(item.action) },
+        })
+    }
+
+
     return (
         <>
             <Typography text={`${monthMap[month?.month]} ${month?.year}`} weight='bold' size='base' styles={{ marginVertical: 20 }} />
@@ -34,7 +45,7 @@ export function EventItem({ month, customerAddress }: EventProps) {
                     <EmptyEventCard />
                     :
                     month?.actions?.sort((a, b) => new Date(a.scheduledDate!).getTime() - new Date(b.scheduledDate!).getTime()).map((action: Action) => (
-                        <EventCard key={action.id} action={action} customerAddress={customerAddress} />
+                        <Pressable onPress={() => goToDetail({ action, date: `${monthMap[month?.month]} ${month?.year}` })}><EventCard key={action.id} action={action} customerAddress={customerAddress} /></Pressable>
                     ))
                 }
             </View>
